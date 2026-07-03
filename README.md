@@ -10,7 +10,7 @@ Validaded with macOS Sequoia 15.6.
 ### Step1. Prepare a prompt script
 e.g.  See [summarize.sh](./summarize.sh)
 
-### Step2: Set up a crontab (e.g. macOS)
+### Step2: Set up a crontab
 e.g. Run 9pm everyday, output stdout/stderr only for the latest update:
 ```
 crontab -e
