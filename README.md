@@ -2,9 +2,9 @@
 Validaded with macOS Sequoia 15.6.
 
 ### Prerequisite
-- Either Claude code CLI or ChatGPT Codex CLO installed in your local machine
+- Either `Claude code CLI` or `ChatGPT Codex CLI` installed in your local machine
 - Claude code: `curl -fsSL https://claude.ai/install.sh | bash`, then launch and authenticate.
-- ChatGPT Codex: ``, then launch and authenticate.
+- ChatGPT Codex: `curl -fsSL https://chatgpt.com/codex/install.sh | bash`, then launch and authenticate.
 
 ### Step1. Prepare a prompt script and example
 - Specify the backend and model to use, customize the PROMPT in [summarize.sh](./summarize.sh) to fit to your interests, detailness, expertise etc.
