@@ -2,13 +2,15 @@
 set -euo pipefail
 
 DATE=$(date +%Y-%m-%d)
+
+MODEL="claude-opus-4-6"
 REPO="absolute path to the local git repo"  #FIXME
 
 # Loop over sub-directories (e.g. hep-ex, quant-ph)
 for CATEGORY in hep-ex quant-ph; do
     OUTPUT=${REPO}/${CATEGORY}/${DATE}.md    
     echo "Fetching ${CATEGORY}..."
-    claude --model claude-opus-4-6 --print "
+    claude --model ${MODEL} --verbose --print "
 Generate a summary of new arXiv papers under the ${CATEGORY} category:
 https://arxiv.org/list/${CATEGORY}/new
 in Japanese. I am mostly expert in LHC/SUSY/dark matter etc. so feel free to do aggressively for hep-ex but more introduction is appreciated for other categories.
