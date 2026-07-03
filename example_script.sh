@@ -11,7 +11,7 @@ for CATEGORY in hep-ex quant-ph; do
     claude --model claude-opus-4-6 --print "
 Generate a summary of new arXiv papers under the ${CATEGORY} category:
 https://arxiv.org/list/${CATEGORY}/new
-in Japanese. I am mostly expert of LHC/SUSY/dark matter etc. so feel free to aggressively comaptify but more introduction is welcomed in summarying quant-ph papers.
+in Japanese. I am mostly expert in LHC/SUSY/dark matter etc. so feel free to do aggressively for hep-ex but more introduction is appreciated for other categories.
 For quant-ph, I'm particularly interested in the hardware development and sensing application.
 The format of the summary is the following:
 
