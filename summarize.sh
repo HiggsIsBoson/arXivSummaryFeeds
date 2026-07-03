@@ -64,7 +64,7 @@ done
 
 
 # Push to git 
-#git add .
-#git commit -m "arXiv daily summary ${DATE} [${BACKEND}]"
-#git push
-#echo "Done!"
+git add .
+git commit -m "arXiv daily summary ${DATE} [${BACKEND}]"
+git push
+echo "Done!"
