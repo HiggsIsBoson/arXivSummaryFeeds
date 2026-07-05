@@ -3,6 +3,14 @@ set -euo pipefail
 
 DATE=$(date +%Y-%m-%d)
 
+# Skip on weekends: arXiv does not announce new papers on Sat/Sun.
+# date +%u => 1=Mon ... 6=Sat, 7=Sun
+DOW=$(date +%u)
+if [ "${DOW}" -ge 6 ]; then
+    echo "Weekend (day ${DOW}): no arXiv update. Skipping."
+    exit 0
+fi
+
 # AI backend selection: "claude" or "codex"
 BACKEND="claude" # "codex"
 
