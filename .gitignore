@@ -1,1 +1,3 @@
 crontab.log
+.slack_webhook
+__pycache__/

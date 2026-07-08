@@ -1,7 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
-DATE=$(date +%Y-%m-%d)
+# cron runs with a minimal PATH (typically just /usr/bin:/bin), so tools
+# installed elsewhere (claude in ~/.local/bin, git/python3/jq in Homebrew)
+# are not found. Prepend their locations here so the script is self-contained
+# regardless of how it is invoked.
+export PATH="${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:${PATH}"
+
+#DATE=$(date +%Y-%m-%d)
+DATE=2026-07-06
 
 # Skip on weekends: arXiv does not announce new papers on Sat/Sun.
 # date +%u => 1=Mon ... 6=Sat, 7=Sun
@@ -13,6 +20,13 @@ fi
 
 # AI backend selection: "claude" or "codex"
 BACKEND="claude" # "codex"
+
+# Slack Incoming Webhook (optional). Feeds each summary to Slack when set.
+# Priority: SLACK_WEBHOOK_URL env var, then a gitignored .slack_webhook file.
+if [ -z "${SLACK_WEBHOOK_URL:-}" ] && [ -f "$(dirname "$0")/.slack_webhook" ]; then
+    SLACK_WEBHOOK_URL=$(tr -d '[:space:]' < "$(dirname "$0")/.slack_webhook")
+fi
+export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 
 # Model selection (claude only, codex will auto-select the model)
 CLAUDE_MODEL="claude-opus-4-8" # "claude-opus-4-8, claude-sonnet-4-8" etc.
@@ -68,6 +82,13 @@ for CATEGORY in hep-ex quant-ph; do
     
     call_ai "${PROMPT}" "${OUTPUT}"
     echo "Saved: ${OUTPUT}"
+
+    # Feed to Slack (no-op if SLACK_WEBHOOK_URL is unset; never blocks the run).
+    if [ -n "${SLACK_WEBHOOK_URL}" ]; then
+        python3 "$(dirname "$0")/post_to_slack.py" "${OUTPUT}" \
+            "arXiv ${CATEGORY} daily summary ${DATE}" \
+            || echo "Slack post failed for ${OUTPUT} (continuing)." >&2
+    fi
 done
 
 
