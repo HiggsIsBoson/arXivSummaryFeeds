@@ -7,8 +7,8 @@ set -euo pipefail
 # regardless of how it is invoked.
 export PATH="${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:${PATH}"
 
-#DATE=$(date +%Y-%m-%d)
-DATE=2026-07-06
+DATE=$(date +%Y-%m-%d)
+#DATE=2026-07-06
 
 # Skip on weekends: arXiv does not announce new papers on Sat/Sun.
 # date +%u => 1=Mon ... 6=Sat, 7=Sun
@@ -68,7 +68,7 @@ call_ai() {
 }
 
 for CATEGORY in hep-ex quant-ph; do
-#for CATEGORY in hep-ex; do
+
     OUTPUT=${CATEGORY}/${DATE}.md
     echo "Fetching ${CATEGORY} with ${BACKEND}..."
     
