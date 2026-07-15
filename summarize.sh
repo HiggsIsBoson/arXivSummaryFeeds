@@ -106,8 +106,12 @@ for CATEGORY in hep-ex quant-ph; do
     call_ai "${PROMPT}" "${TMP}"
     if ! validate_summary "${TMP}"; then
         echo "ERROR: ${CATEGORY} summary invalid; keeping previous ${OUTPUT} and aborting." >&2
-        echo "---- rejected output (first 5 lines) ----" >&2
-        head -5 "${TMP}" >&2
+        if [ -f "${TMP}" ]; then
+            echo "---- rejected output (first 5 lines) ----" >&2
+            head -5 "${TMP}" >&2
+        else
+            echo "(no output file was produced)" >&2
+        fi
         rm -f "${TMP}"
         exit 1
     fi

@@ -1,4 +1,4 @@
 crontab.log
-.slack_webhook
+.slack_webhook*
 __pycache__/
 *.tmp
