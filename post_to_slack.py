@@ -84,13 +84,31 @@ def post(webhook: str, text: str) -> None:
             raise RuntimeError(f"Slack responded: {body!r}")
 
 
+def parse_webhooks(raw: str):
+    """Extract webhook URLs from the env value / file contents.
+
+    One URL per line is the normal form; blank lines and #-comments are
+    ignored, and comma/space separated URLs on a line also work. This lets
+    you feed several Slack workspaces at once.
+    """
+    urls = []
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        for tok in re.split(r"[,\s]+", line):
+            if tok.startswith("http"):
+                urls.append(tok)
+    return urls
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print("usage: post_to_slack.py <markdown_file> [header]", file=sys.stderr)
         return 2
 
-    webhook = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
-    if not webhook:
+    webhooks = parse_webhooks(os.environ.get("SLACK_WEBHOOK_URL", ""))
+    if not webhooks:
         print("SLACK_WEBHOOK_URL not set; skipping Slack post.", file=sys.stderr)
         return 0
 
@@ -118,15 +136,25 @@ def main() -> int:
     body = "\n".join(parts)
 
     chunks = chunk(body)
-    for i, part in enumerate(chunks):
-        # Add a small continuation marker so multi-part posts read cleanly.
-        if len(chunks) > 1 and i > 0:
-            part = f"_(続き {i + 1}/{len(chunks)})_\n{part}"
-        post(webhook, part)
-        time.sleep(0.5)  # be gentle with Slack rate limits
+    failures = 0
+    for w, webhook in enumerate(webhooks):
+        for i, part in enumerate(chunks):
+            # Add a small continuation marker so multi-part posts read cleanly.
+            if len(chunks) > 1 and i > 0:
+                part = f"_(続き {i + 1}/{len(chunks)})_\n{part}"
+            try:
+                post(webhook, part)
+            except Exception as e:
+                # One failing workspace must not stop the others.
+                failures += 1
+                print(f"Slack post to webhook #{w + 1} failed: {e}", file=sys.stderr)
+                break  # skip remaining chunks for this webhook
+            time.sleep(0.5)  # be gentle with Slack rate limits
 
-    print(f"Posted {len(chunks)} message(s) to Slack: {path}")
-    return 0
+    ok = len(webhooks) - failures
+    print(f"Posted {len(chunks)} message(s) to {ok}/{len(webhooks)} "
+          f"Slack workspace(s): {path}")
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":

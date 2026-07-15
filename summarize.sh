@@ -21,10 +21,12 @@ fi
 # AI backend selection: "claude" or "codex"
 BACKEND="claude" # "codex"
 
-# Slack Incoming Webhook (optional). Feeds each summary to Slack when set.
+# Slack Incoming Webhook(s) (optional). Feeds each summary to Slack when set.
 # Priority: SLACK_WEBHOOK_URL env var, then a gitignored .slack_webhook file.
+# The file may hold multiple webhook URLs (one per line, #-comments allowed)
+# to feed several workspaces; newlines are preserved for that reason.
 if [ -z "${SLACK_WEBHOOK_URL:-}" ] && [ -f "$(dirname "$0")/.slack_webhook" ]; then
-    SLACK_WEBHOOK_URL=$(tr -d '[:space:]' < "$(dirname "$0")/.slack_webhook")
+    SLACK_WEBHOOK_URL=$(cat "$(dirname "$0")/.slack_webhook")
 fi
 export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 

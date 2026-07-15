@@ -34,7 +34,18 @@ message splitting, and dividers).
      ```
    - or the `SLACK_WEBHOOK_URL` environment variable (takes priority).
 
-If neither is set, the Slack step is skipped silently — everything else runs
+To feed **several Slack workspaces/channels**, put one webhook URL per line in
+`.slack_webhook` (blank lines and `#`-comments are ignored):
+```
+# team workspace
+https://hooks.slack.com/services/T000/B000/xxxx
+# personal workspace
+https://hooks.slack.com/services/T111/B111/yyyy
+```
+Each summary is posted to every URL; if one workspace fails, the others still
+get it.
+
+If nothing is set, the Slack step is skipped silently — everything else runs
 as normal.
 
 ### Step3. Schedule it
