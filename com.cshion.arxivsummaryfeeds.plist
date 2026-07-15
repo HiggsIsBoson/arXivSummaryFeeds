@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cshion.arxivsummaryfeeds</string>
+
+    <!-- Run summarize.sh. A LaunchAgent runs inside the user's GUI login
+         session, so it can reach the login Keychain and `claude` stays
+         authenticated (unlike cron, which cannot). -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/cshion/Research/paper_slide/arXivSummaryFeeds/summarize.sh</string>
+    </array>
+
+    <!-- summarize.sh uses relative paths (CATEGORY/DATE.md, git add .). -->
+    <key>WorkingDirectory</key>
+    <string>/Users/cshion/Research/paper_slide/arXivSummaryFeeds</string>
+
+    <!-- Weekdays (Mon=1 .. Fri=5) at 21:00. launchd fires each dict. -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer></dict>
+    </array>
+
+    <!-- launchd appends to these, so failure history is preserved. -->
+    <key>StandardOutPath</key>
+    <string>/Users/cshion/Research/paper_slide/arXivSummaryFeeds/crontab.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/cshion/Research/paper_slide/arXivSummaryFeeds/crontab.log</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

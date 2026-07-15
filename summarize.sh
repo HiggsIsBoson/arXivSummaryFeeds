@@ -74,7 +74,7 @@ for CATEGORY in hep-ex quant-ph; do
     
     PROMPT="
     Please generate a summary of new arXiv papers under the ${CATEGORY} category in Japanese.
-    Go through https://arxiv.org/list/${CATEGORY}/new, pick up upto 10 papers to summarize.
+    Go through https://arxiv.org/list/${CATEGORY}/new, pick up upto 3 papers to summarize.
     Please reference the format of ${CATEGORY}/example.md in this repo.
     I am mostly expert in LHC/SUSY/dark matter etc. so feel free to do aggressively for hep-ex but more introduction is appreciated for other categories.
     For hep-ex, focus particularly on novel techniques/ideas, and dark matter/high frequency gravitational wave searches using cavity/quantum sensors.
