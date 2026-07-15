@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template. Do NOT load this file directly (it contains __REPO__ placeholders).
+  Generate the real plist with:  ./install_launchd.sh
+  which substitutes the repo path and installs it into ~/Library/LaunchAgents.
+-->
 <plist version="1.0">
 <dict>
     <key>Label</key>
     <string>com.cshion.arxivsummaryfeeds</string>
 
-    <!-- Run summarize.sh. A LaunchAgent runs inside the user's GUI login
-         session, so it can reach the login Keychain and `claude` stays
-         authenticated (unlike cron, which cannot). -->
+    <!-- A LaunchAgent runs inside the user's GUI login session, so it can
+         reach the login Keychain and `claude` stays authenticated (unlike
+         cron, which cannot). -->
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>/Users/cshion/Research/paper_slide/arXivSummaryFeeds/summarize.sh</string>
+        <string>__REPO__/summarize.sh</string>
     </array>
 
     <!-- summarize.sh uses relative paths (CATEGORY/DATE.md, git add .). -->
     <key>WorkingDirectory</key>
-    <string>/Users/cshion/Research/paper_slide/arXivSummaryFeeds</string>
+    <string>__REPO__</string>
 
     <!-- Weekdays (Mon=1 .. Fri=5) at 21:00. launchd fires each dict. -->
     <key>StartCalendarInterval</key>
@@ -30,9 +35,9 @@
 
     <!-- launchd appends to these, so failure history is preserved. -->
     <key>StandardOutPath</key>
-    <string>/Users/cshion/Research/paper_slide/arXivSummaryFeeds/crontab.log</string>
+    <string>__REPO__/crontab.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/cshion/Research/paper_slide/arXivSummaryFeeds/crontab.log</string>
+    <string>__REPO__/crontab.log</string>
 
     <key>RunAtLoad</key>
     <false/>

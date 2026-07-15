@@ -67,6 +67,24 @@ call_ai() {
     fi
 }
 
+# Sanity-check a generated summary before it is allowed to overwrite the real
+# file. Guards against auth failures / errors (e.g. "Not logged in") or empty
+# output silently clobbering a good summary and getting committed & pushed.
+validate_summary() {
+    local file="$1"
+    # Must exist and be non-trivially sized (a real summary is >1 KB).
+    if [ ! -s "${file}" ] || [ "$(wc -c < "${file}" | tr -d ' ')" -lt 400 ]; then
+        echo "  -> too short/empty" >&2
+        return 1
+    fi
+    # Must not be a CLI error/authentication message.
+    if grep -qiE 'Not logged in|Please run /login|Invalid API key|Credit balance|usage limit|rate limit|Execution error|API Error|Authentication' "${file}"; then
+        echo "  -> looks like an error/auth message" >&2
+        return 1
+    fi
+    return 0
+}
+
 for CATEGORY in hep-ex quant-ph; do
 
     OUTPUT=${CATEGORY}/${DATE}.md
@@ -80,7 +98,18 @@ for CATEGORY in hep-ex quant-ph; do
     For hep-ex, focus particularly on novel techniques/ideas, and dark matter/high frequency gravitational wave searches using cavity/quantum sensors.
     For quant-ph, I'm particularly interested in the hardware development and sensing application."
     
-    call_ai "${PROMPT}" "${OUTPUT}"
+    # Generate into a temp file first, so a failed run never clobbers the
+    # existing good summary (and never gets committed/pushed).
+    TMP="${OUTPUT}.tmp"
+    call_ai "${PROMPT}" "${TMP}"
+    if ! validate_summary "${TMP}"; then
+        echo "ERROR: ${CATEGORY} summary invalid; keeping previous ${OUTPUT} and aborting." >&2
+        echo "---- rejected output (first 5 lines) ----" >&2
+        head -5 "${TMP}" >&2
+        rm -f "${TMP}"
+        exit 1
+    fi
+    mv "${TMP}" "${OUTPUT}"
     echo "Saved: ${OUTPUT}"
 
     # Feed to Slack (no-op if SLACK_WEBHOOK_URL is unset; never blocks the run).
