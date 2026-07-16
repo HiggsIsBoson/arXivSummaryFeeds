@@ -39,7 +39,14 @@ call_ai() {
     local output="$2"
     
     if [ "${BACKEND}" = "claude" ]; then
-        claude --model "${CLAUDE_MODEL}" --verbose --print "${prompt}" > "${output}"
+        # File-modifying tools are disallowed: the summary must come back on
+        # stdout. Otherwise the agent may write CATEGORY/DATE.md directly (or
+        # skip regenerating when it already exists), leaving stdout empty and
+        # tripping the validation guard.
+        # NOTE: --disallowedTools is variadic and would swallow a following
+        # positional argument, so the prompt must come BEFORE it.
+        claude --model "${CLAUDE_MODEL}" --verbose --print "${prompt}" \
+            --disallowedTools "Write,Edit,NotebookEdit,Bash" > "${output}"
 
     elif [ "${BACKEND}" = "codex" ]; then
         local log_file
@@ -98,7 +105,10 @@ for CATEGORY in hep-ex quant-ph; do
     Please reference the format of ${CATEGORY}/example.md in this repo.
     I am mostly expert in LHC/SUSY/dark matter etc. so feel free to do aggressively for hep-ex but more introduction is appreciated for other categories.
     For hep-ex, focus particularly on novel techniques/ideas, and dark matter/high frequency gravitational wave searches using cavity/quantum sensors.
-    For quant-ph, I'm particularly interested in the hardware development and sensing application."
+    For quant-ph, I'm particularly interested in the hardware development and sensing application.
+    IMPORTANT: Reply with ONLY the markdown summary itself (starting with the '# arXiv ...' heading) — no preamble or commentary.
+    Do NOT write, create, edit, or delete any files; your reply text itself will be saved by the calling script.
+    Always generate a fresh summary even if a file for today already exists in the repo."
     
     # Generate into a temp file first, so a failed run never clobbers the
     # existing good summary (and never gets committed/pushed).
