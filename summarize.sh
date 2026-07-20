@@ -30,6 +30,10 @@ if [ -z "${SLACK_WEBHOOK_URL:-}" ] && [ -f "$(dirname "$0")/.slack_webhook" ]; t
 fi
 export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 
+# Space-separated list of categories to feed to Slack. All categories are
+# always generated and pushed to git; only these are posted to Slack.
+SLACK_CATEGORIES="quant-ph" # e.g. "hep-ex quant-ph"
+
 # Model selection (claude only, codex will auto-select the model)
 CLAUDE_MODEL="claude-opus-4-8" # "claude-opus-4-8, claude-sonnet-4-8" etc.
 
@@ -94,8 +98,8 @@ validate_summary() {
     return 0
 }
 
-#for CATEGORY in hep-ex quant-ph; do
-for CATEGORY in quant-ph; do
+for CATEGORY in hep-ex quant-ph; do
+#for CATEGORY in quant-ph; do
 
     OUTPUT=${CATEGORY}/${DATE}.md
     echo "Fetching ${CATEGORY} with ${BACKEND}..."
@@ -129,11 +133,15 @@ for CATEGORY in quant-ph; do
     mv "${TMP}" "${OUTPUT}"
     echo "Saved: ${OUTPUT}"
 
-    # Feed to Slack (no-op if SLACK_WEBHOOK_URL is unset; never blocks the run).
-    if [ -n "${SLACK_WEBHOOK_URL}" ]; then
+    # Feed to Slack, but only for categories listed in SLACK_CATEGORIES
+    # (no-op if SLACK_WEBHOOK_URL is unset; never blocks the run).
+    if [ -n "${SLACK_WEBHOOK_URL}" ] \
+        && [[ " ${SLACK_CATEGORIES} " == *" ${CATEGORY} "* ]]; then
         python3 "$(dirname "$0")/post_to_slack.py" "${OUTPUT}" \
             "arXiv ${CATEGORY} daily summary ${DATE}" \
             || echo "Slack post failed for ${OUTPUT} (continuing)." >&2
+    else
+        echo "Slack: skipping ${CATEGORY} (not in SLACK_CATEGORIES)"
     fi
 done
 
