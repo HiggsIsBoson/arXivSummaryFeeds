@@ -1,6 +1,4 @@
-# arXiv hep-ex Daily Summary - 2026-07-03
-
-本日の `hep-ex/new` を確認しました。新規投稿3本、cross-list 7本、replace 8本です。**quant-ph からの cross-list は本日ゼロ**でした（ハードウェア開発・センシング関連でご興味に沿うものは検出器タイミング技術の [5] くらいです）。あなたのご専門を踏まえ、hep-ex 本体は簡潔に、周辺のダークマター/検出器系を少し厚めにまとめます。
+本日の `hep-ex/new` を確認しました。新規投稿3本、cross-list 7本、replace 8本です。
 
 ---
 
@@ -55,4 +53,4 @@
 
 ---
 
-**総評**: 本日の hep-ex 目玉は **[3] PandaX-4T の太陽 pp-ν**（DM 検出器の ν 天文台化）と、あなたの専門直撃の **[14] Higgsino DM の luminous detection**。quant-ph からの cross-list は本日なく、ハードウェア/センシング枠は [5] 4D検出器・[7] IceCube タイミング・[11]/[16] のキャビティ系が該当します。quant-ph 本体の新着をご覧になりたい場合は、`quant-ph/new` を別途取得して背景厚めでまとめますので言ってください。
+**総評**: 本日の hep-ex 目玉は **[3] PandaX-4T の太陽 pp-ν**（DM 検出器の ν 天文台化）と、あなたの専門直撃の **[14] Higgsino DM の luminous detection**。quant-ph からの cross-list は本日なく、ハードウェア/センシング枠は [5] 4D検出器・[7] IceCube タイミング・[11]/[16] のキャビティ系が該当します。
