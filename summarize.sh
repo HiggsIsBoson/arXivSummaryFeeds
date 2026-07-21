@@ -116,11 +116,25 @@ for CATEGORY in hep-ex quant-ph; do
     Always generate a fresh summary even if a file for today already exists in the repo."
     
     # Generate into a temp file first, so a failed run never clobbers the
-    # existing good summary (and never gets committed/pushed).
+    # existing good summary (and never gets committed/pushed). Transient
+    # failures (e.g. "API Error: Connection closed mid-response") are retried;
+    # running call_ai inside the `if` also keeps a non-zero exit from
+    # silently killing the whole script via `set -e`.
     TMP="${OUTPUT}.tmp"
-    call_ai "${PROMPT}" "${TMP}"
-    if ! validate_summary "${TMP}"; then
-        echo "ERROR: ${CATEGORY} summary invalid; keeping previous ${OUTPUT} and aborting." >&2
+    MAX_ATTEMPTS=3
+    GENERATED=""
+    for ATTEMPT in $(seq 1 ${MAX_ATTEMPTS}); do
+        if call_ai "${PROMPT}" "${TMP}" && validate_summary "${TMP}"; then
+            GENERATED=1
+            break
+        fi
+        echo "WARN: ${CATEGORY} generation attempt ${ATTEMPT}/${MAX_ATTEMPTS} failed." >&2
+        if [ "${ATTEMPT}" -lt "${MAX_ATTEMPTS}" ]; then
+            sleep 30
+        fi
+    done
+    if [ -z "${GENERATED}" ]; then
+        echo "ERROR: ${CATEGORY} summary invalid after ${MAX_ATTEMPTS} attempts; keeping previous ${OUTPUT} and aborting." >&2
         if [ -f "${TMP}" ]; then
             echo "---- rejected output (first 5 lines) ----" >&2
             head -5 "${TMP}" >&2
