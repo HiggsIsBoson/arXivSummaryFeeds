@@ -135,11 +135,21 @@ for CATEGORY in hep-ex quant-ph; do
     done
     if [ -z "${GENERATED}" ]; then
         echo "ERROR: ${CATEGORY} summary invalid after ${MAX_ATTEMPTS} attempts; keeping previous ${OUTPUT} and aborting." >&2
+        REASON="(no output was produced)"
         if [ -f "${TMP}" ]; then
             echo "---- rejected output (first 5 lines) ----" >&2
             head -5 "${TMP}" >&2
+            REASON="$(head -1 "${TMP}")"
         else
             echo "(no output file was produced)" >&2
+        fi
+        # Alert Slack so silent multi-day outages (e.g. an expired claude
+        # login) get noticed. Sent to all webhooks regardless of
+        # SLACK_CATEGORIES; never blocks the abort.
+        if [ -n "${SLACK_WEBHOOK_URL}" ]; then
+            python3 "$(dirname "$0")/post_to_slack.py" --notify \
+                "arXiv summary FAILED for ${CATEGORY} ${DATE}: ${REASON}" \
+                || true
         fi
         rm -f "${TMP}"
         exit 1

@@ -104,13 +104,30 @@ def parse_webhooks(raw: str):
 
 def main() -> int:
     if len(sys.argv) < 2:
-        print("usage: post_to_slack.py <markdown_file> [header]", file=sys.stderr)
+        print("usage: post_to_slack.py <markdown_file> [header]\n"
+              "       post_to_slack.py --notify <text>", file=sys.stderr)
         return 2
 
     webhooks = parse_webhooks(os.environ.get("SLACK_WEBHOOK_URL", ""))
     if not webhooks:
         print("SLACK_WEBHOOK_URL not set; skipping Slack post.", file=sys.stderr)
         return 0
+
+    # --notify: post a short plain message (e.g. a failure alert) to every
+    # webhook, no file involved.
+    if sys.argv[1] == "--notify":
+        text = sys.argv[2] if len(sys.argv) > 2 else "(no message)"
+        failures = 0
+        for w, webhook in enumerate(webhooks):
+            try:
+                post(webhook, f":warning: {text}")
+            except Exception as e:
+                failures += 1
+                print(f"Slack notify to webhook #{w + 1} failed: {e}",
+                      file=sys.stderr)
+        print(f"Notified {len(webhooks) - failures}/{len(webhooks)} "
+              f"Slack workspace(s).")
+        return 1 if failures else 0
 
     path = sys.argv[1]
     header = sys.argv[2] if len(sys.argv) > 2 else ""
