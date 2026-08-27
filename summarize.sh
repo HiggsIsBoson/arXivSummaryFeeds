@@ -35,7 +35,7 @@ export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 SLACK_CATEGORIES="quant-ph" # e.g. "hep-ex quant-ph"
 
 # Model selection (claude only, codex will auto-select the model)
-CLAUDE_MODEL="claude-opus-4-8" # "claude-opus-4-8, claude-sonnet-4-8" etc.
+CLAUDE_MODEL="claude-fable-5" # "claude-fable-5, claude-opus-5, claude-opus-4-8" etc.
 
 # Function to call AI
 call_ai() {
